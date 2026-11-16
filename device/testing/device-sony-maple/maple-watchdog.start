@@ -1,0 +1,13 @@
+#!/bin/sh
+# Bring-up aid: after 150 s, if USB networking was never configured by a host, save logs and reboot.
+# Disable with: touch /etc/maple-no-watchdog
+(
+	sleep 150
+	st=$(cat /sys/class/udc/*/state 2>/dev/null)
+	ts=$(date +%s)
+	mkdir -p /var/log/maple
+	dmesg > /var/log/maple/dmesg-$ts.txt
+	{ echo "udc: $st"; ip addr; rc-status -a; } > /var/log/maple/status-$ts.txt 2>&1
+	sync
+	[ "$st" = "configured" ] || [ -e /etc/maple-no-watchdog ] || reboot -f
+) >/dev/null 2>&1 &

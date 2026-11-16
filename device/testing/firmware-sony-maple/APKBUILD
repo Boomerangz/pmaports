@@ -1,0 +1,15 @@
+pkgname=firmware-sony-maple
+pkgver=1
+pkgrel=2
+pkgdesc="Firmware for Sony Xperia XZ Premium (modem, WLAN, Bluetooth, GPU), extracted from the device"
+url="https://postmarketos.org"
+arch="aarch64"
+license="proprietary"
+options="!check !strip !archcheck !tracedeps pmb:cross-native"
+source=""
+
+package() {
+	mkdir -p "$pkgdir"/lib/firmware
+	cp -r "$startdir"/files/* "$pkgdir"/lib/firmware/
+	find "$pkgdir"/lib/firmware -type f -exec chmod 644 {} +
+}

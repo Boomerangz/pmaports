@@ -1,0 +1,20 @@
+#!/bin/sh
+# ADSP and SLPI firmware lives on the root filesystem, so the kernel cannot boot them at probe time.
+# The ADSP must also finish its own start-up before the kernel opens the APR audio channel,
+# otherwise it stops publishing its QMI services (SLIMbus control among them).
+rp() { for r in /sys/class/remoteproc/remoteproc*; do [ "$(cat $r/name)" = "$1" ] && echo $r; done; }
+bindch() { d=$(ls /sys/bus/rpmsg/devices | grep "$1"); [ -n "$d" ] && echo "$d" > "/sys/bus/rpmsg/drivers/$2/bind" 2>/dev/null; }
+
+s=$(rp slpi); [ -n "$s" ] && [ "$(cat $s/state)" = offline ] && echo start > $s/state
+
+a=$(rp adsp)
+if [ -n "$a" ] && [ "$(cat $a/state)" = offline ]; then
+	echo 0 > /sys/bus/rpmsg/drivers_autoprobe
+	echo start > $a/state
+	sleep 2
+	bindch "17300000.*IPCRTR" qcom_smd_qrtr
+	bindch "17300000.*glink_ssr" qcom_glink_ssr
+	sleep 5
+	echo 1 > /sys/bus/rpmsg/drivers_autoprobe
+	bindch "17300000.*apr_audio_svc" "qcom,apr"
+fi

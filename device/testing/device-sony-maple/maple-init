@@ -1,0 +1,22 @@
+#!/bin/busybox sh
+# Bring-up watchdog wrapper around the postmarketOS initramfs /init.
+# If no USB host has configured the gadget after 100 s, save logs to the SD card's pmOS_boot
+# partition and reboot (a RAM-booted kernel then falls back to Android, where the logs are read).
+(
+	B=/bin/busybox
+	$B sleep 100
+	st=$($B cat /sys/class/udc/*/state 2>/dev/null)
+	[ "$st" = "configured" ] && exit 0
+	$B mkdir -p /maplelog
+	dev=$($B blkid 2>/dev/null | $B grep "pmOS_boot" | $B cut -d: -f1 | $B head -n1)
+	if [ -n "$dev" ] && $B mount "$dev" /maplelog; then
+		$B dmesg > /maplelog/maple-dmesg.txt
+		$B cp /pmOS_init.log /maplelog/maple-init.log 2>/dev/null
+		{ echo "udc state: $st"; $B ls -l /sys/class/udc; $B cat /proc/cmdline; $B ps; } > /maplelog/maple-udc.txt 2>&1
+		$B sync
+		$B umount /maplelog
+	fi
+	$B sync
+	$B reboot -f
+) &
+exec /init "$@"

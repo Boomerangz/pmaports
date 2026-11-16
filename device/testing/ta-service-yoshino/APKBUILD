@@ -1,0 +1,36 @@
+pkgname=ta-service-yoshino
+pkgver=0_git20180925
+pkgrel=0
+pkgdesc="Trim Area and modem log QMI services (227-230) needed by Sony modems"
+url="https://github.com/andersson/ta-service"
+arch="aarch64"
+license="BSD-3-Clause"
+makedepends="qrtr-dev linux-headers"
+subpackages="$pkgname-openrc"
+options="!check"
+provides="ta-service"
+replaces="ta-service"
+source="main.c ta.c ta.h qmi_ta227.c qmi_ta227.h qmi_ta228.c qmi_ta228.h qmi_svc229.c qmi_svc229.h Makefile ta-service-yoshino.initd"
+builddir="$srcdir"
+
+build() {
+	make
+}
+
+package() {
+	install -Dm755 ta-service "$pkgdir"/usr/bin/ta-service
+	install -Dm755 "$srcdir"/ta-service-yoshino.initd "$pkgdir"/etc/init.d/ta-service
+}
+sha512sums="
+bd8488d1d930f3c1997ad08606e76996153fd4f8d7030f8cbc405ccc53eb23fe003e470c95eb0c3e875e944f769899c37e16d4877ee75db63135783605c15792  main.c
+043e5b41b9fd2ca82556caa0c7fccad52d9cff2a012be25e247c5dcf8c0e0f5a85699eaa2384bbb4fe4a34f6698e2c56d0c34148a519a441126ac9978ead96d0  ta.c
+c03320beefc0b5ad1902621c06fe8ceaeb1250ad1b918ff6508bcd2573f4659a245cffab0011097196e9b6250b0aaef0a1cc2411715e00b52d4b937c16dcaf94  ta.h
+b6ad96896d883dcafff4fe060849715a1dded5e9fce3d42d9f207c0ff91befbecd80778461cf7a5ba71bfeff9e10801b299b34ecb8b5de6835a0a4014e198d1e  qmi_ta227.c
+9385b62f5940ad1543d355af100a206ae9fb45723e588be62a0b4d2251dd3286494613f9867aaef9c414532269783003c0368ecf31c1113b143578cfcabf6a50  qmi_ta227.h
+d60c874db2798ba1c9109cb6b7aa48512b178efd802ebd940ef9bf2eea4828f67936301df3a0ac5e780d08d509adb0840b5db10c48dab988e390445ef9ca1f10  qmi_ta228.c
+c68175a4a60aa8cafe5bd28a4e25a803a4139f9ac9cd0640fd56bc179ac1d9bf4565ec22f6048883208565dad15cea70d0dd19ae10968b2ab0352d5e39bf7479  qmi_ta228.h
+2e5cef5452a16e8b5402d6823da5cb21d4f9e0eb9f4aa4c68471f01c93524028c5a93fee110476372075e72126750050b505bf9c15d3168c9411f4ccea79917d  qmi_svc229.c
+bd8735c58ea49842bd63e3f7e9722f5ca5b6e9a20709061149b2076d82ff0b39d2d1eb489dab613b6886937bb53b8435b6436d99177f25a401cf7d0af121cf5b  qmi_svc229.h
+3769f2f6be778482892575a98180f71427b4d7f04b8e77a8b1942ea6093921347fcacef62c46115da85ba542fc7860b685e2cfdfa253e9d62196eeafe70d678e  Makefile
+16a02ceb65cc82301ea632edb137e418598b023d82fd2cdb536c6048f32f56fabe14190e667f519fb863e4a17aa5faaeef097b59d83506ffa468686d3288406c  ta-service-yoshino.initd
+"

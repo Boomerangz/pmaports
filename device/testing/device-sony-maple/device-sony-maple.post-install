@@ -1,0 +1,15 @@
+#!/bin/sh
+# Enable the services the modem (and with it Wi-Fi) needs. Link them directly:
+# on a fresh install this script can run before the packages that ship the
+# init scripts are unpacked, and rc-update refuses unknown services.
+mkdir -p /etc/runlevels/boot /etc/runlevels/default
+for svc in ta-service diag-router rmtfs tqftpserv; do
+	ln -sf /etc/init.d/$svc /etc/runlevels/boot/$svc
+done
+ln -sf /etc/init.d/local /etc/runlevels/default/local
+# rmtfs: use file copies of the modem NV partitions (UFS stays disabled in the kernel)
+if [ -e /etc/conf.d/rmtfs ]; then
+	sed -i "s|^#rmtfs_files_path=.*|rmtfs_files_path=\"/var/lib/rmtfs\"|" /etc/conf.d/rmtfs
+fi
+mkdir -p /var/lib/rmtfs /var/lib/ta
+exit 0

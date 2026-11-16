@@ -1,0 +1,10 @@
+#!/bin/sh
+# The WCN3990 Bluetooth firmware is requested before the root filesystem is mounted,
+# so the first probe fails. Rebind the driver once the firmware files are reachable.
+drv=/sys/bus/serial/drivers/hci_uart_qca
+dev=serial0-0
+if [ -e /sys/class/bluetooth/hci0 ] && ! hciconfig hci0 2>/dev/null | grep -q "UP"; then
+	[ -e $drv/$dev ] && echo $dev > $drv/unbind
+	sleep 1
+	echo $dev > $drv/bind
+fi

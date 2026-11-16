@@ -1,0 +1,23 @@
+#!/sbin/openrc-run
+# Sony modems read their configuration (Trim Area units) from the AP over QMI
+# and push their log lines to it. Without this the modem never finishes booting.
+supervisor=supervise-daemon
+
+name="Sony Trim Area service"
+description="QMI services 227-230 for the Sony modem (TA units, modem log)"
+
+command="/usr/bin/ta-service"
+command_args="${ta_image:-/var/lib/ta/TA.img}"
+output_log="/var/log/ta-service.log"
+error_log="/var/log/ta-service.log"
+
+depend() {
+	before rmtfs
+}
+
+start_pre() {
+	[ -e "${ta_image:-/var/lib/ta/TA.img}" ] || {
+		eerror "No Trim Area image at ${ta_image:-/var/lib/ta/TA.img}"
+		return 1
+	}
+}

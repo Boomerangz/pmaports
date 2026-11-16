@@ -1,0 +1,65 @@
+# Reference: <https://postmarketos.org/devicepkg>
+pkgname=device-sony-maple
+pkgdesc="Sony Xperia XZ Premium"
+pkgver=1
+pkgrel=17
+url="https://postmarketos.org"
+license="MIT"
+arch="aarch64"
+options="!check !archcheck"
+depends="
+	firmware-sony-maple
+	linux-firmware-ath10k
+	linux-sony-maple
+	mkbootimg
+	postmarketos-base
+	qcom-diag
+	rmtfs
+	ta-service-yoshino
+	swclock-offset
+	tqftpserv
+"
+install="$pkgname.post-install"
+subpackages="$pkgname-openrc:openrc"
+
+openrc() {
+	install_if="$pkgname=$pkgver-r$pkgrel openrc"
+	depends="rmtfs-openrc tqftpserv-openrc ta-service-yoshino-openrc qcom-diag-openrc"
+	mkdir -p "$subpkgdir"
+}
+makedepends="devicepkg-dev"
+source="deviceinfo 50-maple-sdlog.sh maple-init 00-maple-init.files maple-watchdog.start maple-bt.start unudhcpd.usb0.confd 10-wifi-powersave-off.conf maple-dsp.start maple-HiFi.conf maple-ucm.conf maple-gtk4-renderer.sh"
+
+build() {
+	devicepkg_build $startdir $pkgname
+}
+
+package() {
+	devicepkg_package $startdir $pkgname
+	install -Dm755 "$srcdir"/50-maple-sdlog.sh "$pkgdir"/usr/share/mkinitfs/hooks/50-maple-sdlog.sh
+	install -Dm755 "$srcdir"/maple-init "$pkgdir"/usr/share/maple/maple-init
+	install -Dm644 "$srcdir"/00-maple-init.files "$pkgdir"/usr/share/mkinitfs/files/00-maple-init.files
+	install -Dm755 "$srcdir"/maple-watchdog.start "$pkgdir"/etc/local.d/maple-watchdog.start
+	install -Dm755 "$srcdir"/maple-bt.start "$pkgdir"/etc/local.d/maple-bt.start
+	install -Dm755 "$srcdir"/maple-dsp.start "$pkgdir"/etc/local.d/maple-dsp.start
+	install -Dm644 "$srcdir"/maple-HiFi.conf "$pkgdir"/usr/share/alsa/ucm2/Sony/maple/HiFi.conf
+	install -Dm644 "$srcdir"/maple-gtk4-renderer.sh "$pkgdir"/etc/profile.d/maple-gtk4-renderer.sh
+	install -Dm644 "$srcdir"/maple-ucm.conf "$pkgdir"/usr/share/alsa/ucm2/conf.d/apq8096/Xperia-XZ-Premium.conf
+	install -Dm644 "$srcdir"/unudhcpd.usb0.confd "$pkgdir"/etc/conf.d/unudhcpd.usb0
+	install -Dm644 "$srcdir"/10-wifi-powersave-off.conf "$pkgdir"/etc/NetworkManager/conf.d/10-wifi-powersave-off.conf
+}
+
+sha512sums="
+e74dc0209fb67e4554e2ebd5f5a2bb5891ce009829533effba4a15196d5867181dd07f7e5598c6e98e97bb159674b3ad2f6139d86133f3bf9c36d6d5282783e1  deviceinfo
+17f04283e5b4d9cbd9f8844240c025440866613152ba33ea088a6bf51af1d66a3a905b12395655a07a548214530c89e15feee873d00280896a4c9eb9ac29e769  50-maple-sdlog.sh
+1b6c36fd3804c7916839b34e39b336902580e1afdbe80feb1fe98a21609e3eecc0205e082caddb1bea4884f38b8eaf550873f4f1bcbd810b5e203a180e30ece3  maple-init
+153c28dbf3b823e31faf06be18aad16af98bde361419be45d7622e09edf51949307163debccdc18a454a84330695249a9f30e8457d1b3644456218cb3c0f95bc  00-maple-init.files
+288e1bd9dbca1b3279681ef8e4aac7d30458f960213c7e0bd447bffeaaedcf9bf86aa994dbca5bd7dc8a3326a6ddbb937b1c668ba731e208b45f23e29f7786e8  maple-watchdog.start
+b100f9e09803a2d6bf0ca76b0fe73f541c4771dceb0771c48968439282df6e04c3d5d91c7da74a989e725451c57f9a0e0edb87aa7e6c33859e3e8df90fe0055d  maple-bt.start
+66b8d3e029b6ce8e0503241a80cf5d641830143cb7e81768bfd3bbe793003b661c73ac76a5a3fb622862381317624ac9ca979f0d828c2a4861a0fe21e5b8b475  unudhcpd.usb0.confd
+8692b03ef5951179e8e2d622285925d8db9ec1999fe71c5611a37ba67f7c44b209c44ae4f467dfb3bb96f4b3257a243dc3060bf73e218d372fd06ca31e9e8de0  10-wifi-powersave-off.conf
+3467f6bc963fde2987e2f27abd0e6f298d619c9720c506f6d5bfc40b70fb773bc36272d34034da097b0faea039a9a8694e9d6724f7463718d871887eeccc70ef  maple-dsp.start
+f7b9001c1f5ced849481f5b5b5b0d54e16217e69b9a7e6716eee7d2c20d8993244f0481b37c2d03c8c1db2f0ab07336138b72be8a3c630eb625513d22f780eae  maple-HiFi.conf
+cfcd1f5a04feaaee8ea32c473046bc4bae5cd70961ced7b2729fb3456e86caf13ad1d6cef36d96e08ed197bfb3b069d5a40afc4c9557477b3703797d68839883  maple-ucm.conf
+32af76c7b1a865ef2ee750e5003ca9f800f5ec1fca73c6b5b691fbe1e1f13a53844338db3abf05d1d68a6e68690067a919c53bd3bef8d6e5f96682ee922efa31  maple-gtk4-renderer.sh
+"

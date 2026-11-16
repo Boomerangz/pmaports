@@ -1,0 +1,38 @@
+# Mainline kernel (msm8998-mainline fork) for Sony Xperia XZ Premium
+_flavor="sony-maple"
+pkgname=linux-$_flavor
+pkgver=6.18
+pkgrel=0
+_commit="4e0c53280d9757b3872d3823b9f94066669aa388"
+pkgdesc="Mainline kernel fork for Sony Xperia XZ Premium"
+arch="aarch64"
+_carch="arm64"
+url="https://github.com/msm8998-mainline/linux"
+license="GPL-2.0-only"
+options="!strip !check !tracedeps pmb:cross-native"
+makedepends="bash python3 py3-lxml bison findutils flex linux-headers openssl-dev perl postmarketos-installkernel xz"
+source="$url/archive/$_commit/linux-$_commit.tar.gz"
+builddir="$srcdir/linux-$_commit"
+
+prepare() {
+	default_prepare
+	make ARCH="$_carch" msm8998_defconfig maple.config
+}
+
+build() {
+	unset LDFLAGS
+	make ARCH="$_carch" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1))-$_flavor"
+}
+
+package() {
+	mkdir -p "$pkgdir"/boot
+	make zinstall dtbs_install \
+		ARCH="$_carch" \
+		INSTALL_PATH="$pkgdir"/boot \
+		INSTALL_DTBS_PATH="$pkgdir"/boot/dtbs
+	install -D "$builddir"/include/config/kernel.release \
+		"$pkgdir"/usr/share/kernel/$_flavor/kernel.release
+}
+
+sha512sums="SKIP"
