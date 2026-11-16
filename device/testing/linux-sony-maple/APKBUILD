@@ -3,11 +3,11 @@ _flavor="sony-maple"
 pkgname=linux-$_flavor
 pkgver=6.18
 pkgrel=0
-_commit="4e0c53280d9757b3872d3823b9f94066669aa388"
+_commit="10875f80c16d0c70f86f233827243f3bd9d7ad63"
 pkgdesc="Mainline kernel fork for Sony Xperia XZ Premium"
 arch="aarch64"
 _carch="arm64"
-url="https://github.com/msm8998-mainline/linux"
+url="https://github.com/Boomerangz/linux"
 license="GPL-2.0-only"
 options="!strip !check !tracedeps pmb:cross-native"
 makedepends="bash python3 py3-lxml bison findutils flex linux-headers openssl-dev perl postmarketos-installkernel xz"
@@ -35,4 +35,6 @@ package() {
 		"$pkgdir"/usr/share/kernel/$_flavor/kernel.release
 }
 
-sha512sums="SKIP"
+sha512sums="
+30b34fe5ba1f93224341edc1630fba8509cbc8469d3bc807ded0ea99428b25dfea00565cee895b4ba7bf8a8012cbc97f6674a7fe82154ce4b09fdb9f2b27b842  linux-10875f80c16d0c70f86f233827243f3bd9d7ad63.tar.gz
+"
