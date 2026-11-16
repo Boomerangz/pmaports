@@ -2,7 +2,7 @@
 pkgname=device-sony-maple
 pkgdesc="Sony Xperia XZ Premium"
 pkgver=1
-pkgrel=17
+pkgrel=18
 url="https://postmarketos.org"
 license="MIT"
 arch="aarch64"
@@ -14,21 +14,29 @@ depends="
 	mkbootimg
 	postmarketos-base
 	qcom-diag
+	reboot-mode
 	rmtfs
 	ta-service-yoshino
 	swclock-offset
 	tqftpserv
 "
 install="$pkgname.post-install"
-subpackages="$pkgname-openrc:openrc"
+subpackages="$pkgname-openrc:openrc $pkgname-lomiri:lomiri"
 
 openrc() {
 	install_if="$pkgname=$pkgver-r$pkgrel openrc"
 	depends="rmtfs-openrc tqftpserv-openrc ta-service-yoshino-openrc qcom-diag-openrc"
 	mkdir -p "$subpkgdir"
 }
+lomiri() {
+	pkgdesc="Lomiri profile and missing dependencies for the Xperia XZ Premium"
+	install_if="$pkgname=$pkgver-r$pkgrel postmarketos-ui-lomiri"
+	depends="lomiri-ui-extras-qt5 maliit-keyboard"
+	install -Dm644 "$srcdir"/maple-lomiri-deviceinfo.yaml \
+		"$subpkgdir"/etc/lomiri-deviceinfo/devices/maple.yaml
+}
 makedepends="devicepkg-dev"
-source="deviceinfo 50-maple-sdlog.sh maple-init 00-maple-init.files maple-watchdog.start maple-bt.start unudhcpd.usb0.confd 10-wifi-powersave-off.conf maple-dsp.start maple-HiFi.conf maple-ucm.conf maple-gtk4-renderer.sh"
+source="deviceinfo 50-maple-sdlog.sh maple-init 00-maple-init.files maple-watchdog.start maple-bt.start unudhcpd.usb0.confd 10-wifi-powersave-off.conf maple-dsp.start maple-HiFi.conf maple-ucm.conf maple-gtk4-renderer.sh maple-lomiri-deviceinfo.yaml"
 
 build() {
 	devicepkg_build $startdir $pkgname
@@ -62,4 +70,5 @@ b100f9e09803a2d6bf0ca76b0fe73f541c4771dceb0771c48968439282df6e04c3d5d91c7da74a98
 f7b9001c1f5ced849481f5b5b5b0d54e16217e69b9a7e6716eee7d2c20d8993244f0481b37c2d03c8c1db2f0ab07336138b72be8a3c630eb625513d22f780eae  maple-HiFi.conf
 cfcd1f5a04feaaee8ea32c473046bc4bae5cd70961ced7b2729fb3456e86caf13ad1d6cef36d96e08ed197bfb3b069d5a40afc4c9557477b3703797d68839883  maple-ucm.conf
 32af76c7b1a865ef2ee750e5003ca9f800f5ec1fca73c6b5b691fbe1e1f13a53844338db3abf05d1d68a6e68690067a919c53bd3bef8d6e5f96682ee922efa31  maple-gtk4-renderer.sh
+d04ef7a4bb5a4783b3da3bdaac159723dbec4a97d79d5d72663dee4ba7938db711f37cec2c241f70778a5df119a4033c1d25ee1a5c1d876ad753ab4e0fb23a2f  maple-lomiri-deviceinfo.yaml
 "

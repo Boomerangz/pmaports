@@ -1,0 +1,18 @@
+#!/bin/busybox sh
+# Fresh-install boot test: the system lives in image files on the SD card's
+# existing root partition; attach them as loop devices, then run the normal init.
+B=/bin/busybox
+$B mkdir -p /dev /proc /sys /hostsd
+$B mount -t devtmpfs dev /dev
+$B mount -t proc proc /proc
+$B mount -t sysfs sys /sys
+i=0
+while [ ! -b /dev/mmcblk0p2 ] && [ $i -lt 150 ]; do $B sleep 0.2; i=$((i+1)); done
+$B mount -t ext4 /dev/mmcblk0p2 /hostsd
+$B losetup /dev/loop0 /hostsd/fresh-test/boot.img
+$B losetup /dev/loop1 /hostsd/fresh-test/root.img
+$B losetup > /loop-init.log 2>&1
+$B umount /sys
+$B umount /proc
+$B umount /dev
+exec /usr/share/maple/maple-init "$@"

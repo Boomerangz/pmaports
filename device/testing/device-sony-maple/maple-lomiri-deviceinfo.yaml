@@ -1,0 +1,10 @@
+maple:
+  Names:
+    - Sony Xperia XZ Premium
+    - "Sony Xperia XZ Premium "
+    - sony,xperia-maple
+  PrettyName: Sony Xperia XZ Premium
+  DeviceType: phone
+  GridUnit: 21
+  WebkitDpr: 2.5
+  PrimaryOrientation: Portrait

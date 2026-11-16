@@ -1,0 +1,13 @@
+#!/bin/sh
+# ssh to the phone over the USB network: IPv4 172.16.42.1 if the Mac got a lease, otherwise IPv6 link-local.
+O="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=8 -o ServerAliveInterval=5 -o ServerAliveCountMax=2"
+if ping -c1 -t1 172.16.42.1 >/dev/null 2>&1; then
+	exec ssh $O user@172.16.42.1 "$@"
+fi
+for ifc in $(ifconfig -l | tr ' ' '\n' | grep -E '^en[1-9][0-9]*$'); do
+	me=$(ifconfig "$ifc" | awk '/inet6 fe80/{print $2}' | cut -d% -f1)
+	[ -n "$me" ] || continue
+	peer=$(ping6 -c2 -i1 "ff02::1%$ifc" 2>/dev/null | grep -oE 'fe80::[0-9a-f:]+' | sort -u | grep -v "^$me\$" | head -1)
+	[ -n "$peer" ] && exec ssh -6 $O "user@$peer%$ifc" "$@"
+done
+echo "phone not reachable over USB network" >&2; exit 255
